@@ -60,6 +60,7 @@ public class MyRendererScene extends Scene2D {
 
     if (mesh != null) {
       // TODO: Draw the mesh here
+      //Test
     }
   }
 
