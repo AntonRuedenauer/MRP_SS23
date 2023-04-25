@@ -7,9 +7,13 @@
 package mixedreality.lab.exercise3;
 
 import com.jme3.math.FastMath;
+import com.jme3.math.Matrix3f;
+import com.jme3.math.Matrix4f;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.math.Vector4f;
 import mixedreality.base.mesh.ObjReader;
+import mixedreality.base.mesh.Triangle;
 import mixedreality.base.mesh.TriangleMesh;
 import ui.Scene2D;
 
@@ -59,9 +63,59 @@ public class MyRendererScene extends Scene2D {
     Graphics2D g2 = (Graphics2D) g;
 
     if (mesh != null) {
-      // TODO: Draw the mesh here
-      //Test
+      for(int i = 0; i < mesh.getNumberOfTriangles(); i++) {
+
+        // Set up the model matrix
+        Matrix4f modelMatrix = new Matrix4f().IDENTITY;
+        // create pwelt -> pwelt = modelMatrix.mult(positionOfVerticeInTriangle)
+        // TODO: Iterate through every triangle and vertice and transform its position with the matrices and draw a line between them
+
+        // Set up the view matrix
+        Matrix4f viewMatrix = getViewMatrix(camera.getEye(), camera.getRef(), camera.getUp());
+
+        // create pcam -> pcam = viewMatrix.mult(p)
+
+        // Set up the projection matrix
+        Matrix4f projMatrix = getProjectionMatrix();
+        // create pbild -> pbild = projMatrix.mult(pcam)
+        // dont forget to divide w
+
+        // Set up the screenmapping matrix
+        Matrix4f screenMapMatrix = getScreenMapMatrix();
+
+        // create ppixel -> ppixel = screenMapMatrix.mult(pbild)
+      }
     }
+  }
+
+  public Matrix4f getViewMatrix(Vector3f eye, Vector3f ref, Vector3f up) {
+    Vector3f tmp = eye.subtract(ref);
+    Vector3f z = tmp.divide(tmp.length());
+    Vector3f x = up.cross(z);
+    Vector3f y = z.cross(x);
+    Matrix4f viewMatrix = new Matrix4f(x.x, y.x, z.x, eye.x,
+            x.y, y.y, z.y, eye.y,
+            x.z, y.z, z.z, eye.z,
+            0, 0, 0, 1);
+    return viewMatrix;
+  }
+
+  public Matrix4f getProjectionMatrix() {
+    int z0 = 1;
+    Matrix4f projectionMatrix = new Matrix4f(1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 1/z0, 0);
+    return projectionMatrix;
+  }
+
+  public Matrix4f getScreenMapMatrix() {
+    float f = camera.getWidth() / 2 * FastMath.tan(camera.getFovX() / 2);
+    Matrix4f screenMapMatrix = new Matrix4f(f, 0, 0, camera.getWidth()/2,
+            0, f, 0, camera.getHeight()/2,
+            0, 0, 0, 0,
+            0, 0, 0, 0);
+    return screenMapMatrix;
   }
 
   @Override

@@ -43,7 +43,6 @@ public class MixedReality2D extends CG2DApplication {
         addScene2D(new LSystemScene2D(800, 600));
     }
 
-    public static void main(String[] args) {
-        new MixedReality2D();
+    public static void main(String[] args) { new MixedReality2D();
     }
 }
