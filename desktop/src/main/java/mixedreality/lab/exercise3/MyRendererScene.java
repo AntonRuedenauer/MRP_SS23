@@ -12,6 +12,7 @@ import com.jme3.math.Matrix4f;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.math.Vector4f;
+import java.util.HashMap;
 import mixedreality.base.mesh.ObjReader;
 import mixedreality.base.mesh.Triangle;
 import mixedreality.base.mesh.TriangleMesh;
@@ -52,8 +53,8 @@ public class MyRendererScene extends Scene2D {
     lastMousePosition = null;
 
     ObjReader reader = new ObjReader();
-    mesh = reader.read("models/cube.obj");
-    //mesh = reader.read("Models/deer.obj");
+    //mesh = reader.read("models/cube.obj");
+    mesh = reader.read("Models/deer.obj");
 
     setupListeners();
   }
@@ -63,33 +64,40 @@ public class MyRendererScene extends Scene2D {
     Graphics2D g2 = (Graphics2D) g;
 
     if (mesh != null) {
-      for(int i = 0; i < mesh.getNumberOfTriangles(); i++) {
-
-        // Set up the model matrix
+      for (int i = 0; i < mesh.getNumberOfTriangles(); i++) {
+        // Set up the model matrix and transform points
         Matrix4f modelMatrix = new Matrix4f().IDENTITY;
-        // create pwelt -> pwelt = modelMatrix.mult(positionOfVerticeInTriangle)
-        // TODO: Iterate through every triangle and vertice and transform its position with the matrices and draw a line between them
-
-        // Set up the view matrix
+        Vector3f pwelt1 = modelMatrix.mult(mesh.getVertex(mesh.getTriangle(i).getA()).getPosition());
+        Vector3f pwelt2 = modelMatrix.mult(mesh.getVertex(mesh.getTriangle(i).getB()).getPosition());
+        Vector3f pwelt3 = modelMatrix.mult(mesh.getVertex(mesh.getTriangle(i).getC()).getPosition());
+        // Set up the view matrix and transform points
         Matrix4f viewMatrix = getViewMatrix(camera.getEye(), camera.getRef(), camera.getUp());
-
-        // create pcam -> pcam = viewMatrix.mult(p)
-
-        // Set up the projection matrix
+        Vector3f pcam1 = viewMatrix.mult(pwelt1);
+        Vector3f pcam2 = viewMatrix.mult(pwelt2);
+        Vector3f pcam3 = viewMatrix.mult(pwelt3);
+        // Set up the projection matrix and transform points
         Matrix4f projMatrix = getProjectionMatrix();
-        // create pbild -> pbild = projMatrix.mult(pcam)
-        // dont forget to divide w
-
-        // Set up the screenmapping matrix
+        Vector3f pbild1 = projMatrix.mult(pcam1);
+        Vector3f pbild2 = projMatrix.mult(pcam2);
+        Vector3f pbild3 = projMatrix.mult(pcam3);
+        pbild1.divide(pbild1.z);
+        pbild2.divide(pbild2.z);
+        pbild3.divide(pbild3.z);
+        // Set up the screenmapping matrix and transform points
         Matrix4f screenMapMatrix = getScreenMapMatrix();
-
-        // create ppixel -> ppixel = screenMapMatrix.mult(pbild)
+        Vector3f ppixel1 = screenMapMatrix.mult(pbild1);
+        Vector3f ppixel2 = screenMapMatrix.mult(pbild2);
+        Vector3f ppixel3 = screenMapMatrix.mult(pbild3);
+        // Draw line
+        g2.setColor(Color.BLUE);
+        drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel2.x, ppixel2.y), g2.getColor());
+        drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel3.x, ppixel3.y), g2.getColor());
       }
     }
   }
 
   public Matrix4f getViewMatrix(Vector3f eye, Vector3f ref, Vector3f up) {
-    Vector3f tmp = eye.subtract(ref);
+    Vector3f tmp = ref.subtract(eye);
     Vector3f z = tmp.divide(tmp.length());
     Vector3f x = up.cross(z);
     Vector3f y = z.cross(x);
