@@ -7,15 +7,12 @@
 package mixedreality.lab.exercise3;
 
 import com.jme3.math.FastMath;
-import com.jme3.math.Matrix3f;
 import com.jme3.math.Matrix4f;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.math.Vector4f;
-import java.util.HashMap;
 import mixedreality.base.mesh.ObjReader;
-import mixedreality.base.mesh.Triangle;
 import mixedreality.base.mesh.TriangleMesh;
+import org.opencv.core.Mat;
 import ui.Scene2D;
 
 import javax.swing.*;
@@ -23,6 +20,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+
+import static mixedreality.base.math.ConvexHull2D.cross;
+import static org.opencv.core.Core.subtract;
 
 /**
  * Drawing canvas for a 3D renderer.
@@ -62,6 +62,7 @@ public class MyRendererScene extends Scene2D {
   @Override
   public void paint(Graphics g) {
     Graphics2D g2 = (Graphics2D) g;
+    g2.setColor(Color.BLUE);
 
     if (mesh != null) {
       for (int i = 0; i < mesh.getNumberOfTriangles(); i++) {
@@ -88,12 +89,23 @@ public class MyRendererScene extends Scene2D {
         Vector3f ppixel1 = screenMapMatrix.mult(pbild1);
         Vector3f ppixel2 = screenMapMatrix.mult(pbild2);
         Vector3f ppixel3 = screenMapMatrix.mult(pbild3);
-        // Draw line
-        g2.setColor(Color.BLUE);
-        drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel2.x, ppixel2.y), g2.getColor());
-        drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel3.x, ppixel3.y), g2.getColor());
+        if (!backfaceCulling) {
+          // Draw line
+          drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel2.x, ppixel2.y), g2.getColor());
+          drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel3.x, ppixel3.y), g2.getColor());
+        } else {
+          if (triangleIsClockwise(ppixel1, ppixel2, ppixel3)){
+            // Draw line
+            drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel2.x, ppixel2.y), g2.getColor());
+            drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel3.x, ppixel3.y), g2.getColor());
+          }
+        }
       }
     }
+  }
+
+  private boolean triangleIsClockwise(Vector3f p1, Vector3f p2, Vector3f p3) {
+    return cross(new Vector2f(p1.x, p1.y),new Vector2f(p2.x, p2.y), new Vector2f(p3.x, p3.y)) < 0;
   }
 
   public Matrix4f getViewMatrix(Vector3f eye, Vector3f ref, Vector3f up) {
