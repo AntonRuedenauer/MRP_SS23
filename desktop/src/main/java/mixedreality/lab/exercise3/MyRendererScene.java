@@ -9,6 +9,7 @@ package mixedreality.lab.exercise3;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.math.Vector4f;
 import mixedreality.base.mesh.ObjReader;
 import mixedreality.base.mesh.TriangleMesh;
 import ui.Scene2D;
@@ -61,32 +62,43 @@ public class MyRendererScene extends Scene2D {
     @Override
     public void paint(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
+        g.clearRect(0, 0, getWidth(), getHeight());
         g2.setColor(Color.BLUE);
 
         if (mesh != null) {
             for (int i = 0; i < mesh.getNumberOfTriangles(); i++) {
-                Vector3f[] modelMatrix = math.createModelMatrix(mesh, i);
-                Vector3f[] viewMatrix = math.createViewMatrix(camera, modelMatrix);
-                Vector3f[] projectionMatrix = math.createProjectionMatrix(viewMatrix);
-                Vector3f[] screenMappingMatrix = math.createScreenMappingMatrix(projectionMatrix, camera);
-                drawTriangle(g2, screenMappingMatrix[0], screenMappingMatrix[1], screenMappingMatrix[2]);
+                Vector4f[] modelPositions = math.getModelPositions(mesh, i);
+                System.out.println("ModelPos: ");
+                System.out.println(modelPositions[0]);
+                Vector4f[] viewPositions = math.getViewPositions(camera, modelPositions);
+                System.out.println("ViewPos: ");
+                System.out.println(viewPositions[0]);
+                Vector4f[] projectionPositions = math.getProjectionPositions(viewPositions);
+                System.out.println("ProjPos: ");
+                System.out.println(projectionPositions[0]);
+                Vector4f[] screenPositions = math.getScreenPositions(projectionPositions, camera);
+                System.out.println("ScreenPos: ");
+                System.out.println(screenPositions[0]);
+                drawTriangle(g2, screenPositions[0], screenPositions[1], screenPositions[2]);
             }
         }
     }
 
-    private void drawTriangle(Graphics2D g2, Vector3f ppixel1, Vector3f ppixel2, Vector3f ppixel3) {
+    private void drawTriangle(Graphics2D g2, Vector4f ppixel1, Vector4f ppixel2, Vector4f ppixel3) {
         if (!backfaceCulling) {
             // Draw line
             drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel2.x, ppixel2.y), g2.getColor());
             drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel3.x, ppixel3.y), g2.getColor());
+            //drawLine(g2, new Vector2f(ppixel2.x, ppixel2.y), new Vector2f(ppixel3.x, ppixel3.y), g2.getColor());
         } else if (triangleIsClockwise(ppixel1, ppixel2, ppixel3)) {
             // Draw line
             drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel2.x, ppixel2.y), g2.getColor());
             drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel3.x, ppixel3.y), g2.getColor());
+            //drawLine(g2, new Vector2f(ppixel2.x, ppixel2.y), new Vector2f(ppixel3.x, ppixel3.y), g2.getColor());
         }
     }
 
-    private boolean triangleIsClockwise(Vector3f p1, Vector3f p2, Vector3f p3) {
+    private boolean triangleIsClockwise(Vector4f p1, Vector4f p2, Vector4f p3) {
         return cross(new Vector2f(p1.x, p1.y), new Vector2f(p2.x, p2.y), new Vector2f(p3.x, p3.y)) < 0;
     }
 

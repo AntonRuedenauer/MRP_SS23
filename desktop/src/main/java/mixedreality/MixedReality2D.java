@@ -6,7 +6,9 @@
 
 package mixedreality;
 
+import com.jme3.math.Matrix4f;
 import com.jme3.math.Vector2f;
+import com.jme3.math.Vector4f;
 import mixedreality.base.math.Curve;
 import mixedreality.lab.exercise1.BasisFunctionDummy;
 import mixedreality.lab.exercise1.BezierBasisfunktion;
@@ -33,16 +35,16 @@ public class MixedReality2D extends CG2DApplication {
         addScene2D(new CurveScene2D(600, 600, curve));
 
         // Assignment 2
-        addScene2D(new Assignment2Scene2D(800, 600));
+        //addScene2D(new Assignment2Scene2D(800, 600));
 
         // Assignment 3
         addScene2D(new MyRendererScene(600, 600));
 
         // Assignment 4
-        addScene2D(new SimplificationScene(600, 600));
+        //addScene2D(new SimplificationScene(600, 600));
 
         // Assignment 6
-        addScene2D(new LSystemScene2D(800, 600));
+        //addScene2D(new LSystemScene2D(800, 600));
     }
 
     public static void main(String[] args) {
