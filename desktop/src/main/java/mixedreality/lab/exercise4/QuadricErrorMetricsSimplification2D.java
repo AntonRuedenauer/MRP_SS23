@@ -9,6 +9,7 @@ package mixedreality.lab.exercise4;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import math.Matrix2f;
 import misc.Logger;
 
 import java.util.*;
@@ -92,11 +93,17 @@ public class QuadricErrorMetricsSimplification2D {
   /**
    * Computes the initial QEM for an edge.
    */
-  protected Matrix3f computeDistanceMatrix(PolygonEdge edge) {
+  protected Matrix3f computeDistanceMatrix(PolygonEdge poly) {
+    Vector2f edge = poly.getStartVertex().getPosition().subtract(poly.getStartVertex().getPosition());
+    Vector2f normal = new Vector2f(edge.y, -edge.x).normalize();
+    Vector3f normalPeak = new Vector3f(normal.x, normal.y, -normal.dot(poly.getStartVertex().getPosition()));
+    return dyad(normalPeak, normalPeak);
+  }
 
-    // TODO
-
-    return new Matrix3f();
+  private Matrix3f dyad(Vector3f a, Vector3f b) {
+    return new Matrix3f(a.x * b.x, a.x * b.y, a.x * b.z,
+            a.y * b.x, a.y * b.y, a.y * b.z,
+            a.z * b.x, a.z * b.y, a.z * b.z);
   }
 
   protected Matrix3f computePointQem(PolygonVertex v) {
