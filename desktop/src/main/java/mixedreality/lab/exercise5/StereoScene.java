@@ -232,10 +232,32 @@ public class StereoScene extends Scene3D {
     Vector4f leftScreenCoordidnates = new Vector4f(leftScreenCoords.x, leftScreenCoords.y, 0, 0);
     Vector4f rightScreenCoordidnates = new Vector4f(rightScreenCoords.x, rightScreenCoords.y, 0, 0);
 
-    //
-    Matrix4f cameraProjetctionMatrix = matrix.createViewMatrixCamA().mult(matrix.createProjectionMatrix(true)).mult(matrix.createScreenMappingMatrix(true));
+    // Fehlerfunktion ableiten mit Vorwärtsdifferenzenquotient
+    Matrix4f cameraProjectionMatrixA = matrix.createViewMatrixCamA().mult(matrix.createProjectionMatrix(true)).mult(matrix.createScreenMappingMatrix(true));
+    Matrix4f cameraProjectionMatrixB = matrix.createViewMatrixCamA().mult(matrix.createProjectionMatrix(false)).mult(matrix.createScreenMappingMatrix(false));
 
-    Vector4f forward_diff_x = cameraProjetctionMatrix.mult(new Vector4f((float) (initP.x + stepSize), initP.y, initP.z, initP.w)).subtract(cameraProjetctionMatrix.mult(initP));
+    Vector4f forward_diff_rightX = rightScreenCoordidnates.subtract(cameraProjectionMatrixA.mult(new Vector4f((float) (initP.x + stepSize), initP.y, initP.z, initP.w)).subtract(cameraProjectionMatrixA.mult(initP)));
+    Vector4f forward_diff_rightY = rightScreenCoordidnates.subtract(cameraProjectionMatrixA.mult(new Vector4f(initP.x, (float) ( initP.y + stepSize), initP.z, initP.w)).subtract(cameraProjectionMatrixA.mult(initP)));
+    Vector4f forward_diff_rightZ = rightScreenCoordidnates.subtract(cameraProjectionMatrixA.mult(new Vector4f((initP.x), initP.y, (float) (initP.z + stepSize), initP.w)).subtract(cameraProjectionMatrixA.mult(initP)));
+
+    Vector4f forward_diff_leftX = leftScreenCoordidnates.subtract(cameraProjectionMatrixA.mult(new Vector4f((float) (initP.x + stepSize), initP.y, initP.z, initP.w)).subtract(cameraProjectionMatrixA.mult(initP)));
+    Vector4f forward_diff_leftY = leftScreenCoordidnates.subtract(cameraProjectionMatrixA.mult(new Vector4f(initP.x, (float) ( initP.y + stepSize), initP.z, initP.w)).subtract(cameraProjectionMatrixA.mult(initP)));
+    Vector4f forward_diff_leftZ = leftScreenCoordidnates.subtract(cameraProjectionMatrixA.mult(new Vector4f((initP.x), initP.y, (float) (initP.z + stepSize), initP.w)).subtract(cameraProjectionMatrixA.mult(initP)));
+
+    // Jeden Wert durch Schrittweite dividieren
+    Vector4f partial_derivative_rightX = new Vector4f((float) (forward_diff_rightX.x/stepSize), (float) (forward_diff_rightX.y/stepSize), (float) (forward_diff_rightX.z/stepSize), 1);
+    Vector4f partial_derivative_rightY = new Vector4f((float) (forward_diff_rightY.x/stepSize), (float) (forward_diff_rightY.y/stepSize), (float) (forward_diff_rightY.z/stepSize), 1);
+    Vector4f partial_derivative_rightZ = new Vector4f((float) (forward_diff_rightZ.x/stepSize), (float) (forward_diff_rightZ.y/stepSize), (float) (forward_diff_rightZ.z/stepSize), 1);
+
+    Vector4f partial_derivative_leftX = new Vector4f((float) (forward_diff_leftX.x/stepSize), (float) (forward_diff_leftX.y/stepSize), (float) (forward_diff_leftX.z/stepSize), 1);
+    Vector4f partial_derivative_leftY = new Vector4f((float) (forward_diff_leftY.x/stepSize), (float) (forward_diff_leftY.y/stepSize), (float) (forward_diff_leftY.z/stepSize), 1);
+    Vector4f partial_derivative_leftZ = new Vector4f((float) (forward_diff_leftZ.x/stepSize), (float) (forward_diff_leftZ.y/stepSize), (float) (forward_diff_leftZ.z/stepSize), 1);
+
+    // Absolut Wert bilden und right und left addieren
+
+    // Gradient bilden und iterativ mit Konvergenzbedingung updaten wie auf Folie 48 (nachher in separater Methode)
+
+    return 0;
   }
 
   private double gradientProcess() {
