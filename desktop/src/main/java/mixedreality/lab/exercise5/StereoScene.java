@@ -24,6 +24,8 @@ import mixedreality.lab.exercise3.Camera;
 import ui.AbstractCameraController;
 import ui.Scene3D;
 
+import mixedreality.lab.exercise5.Matrices;
+
 import javax.swing.*;
 
 /**
@@ -52,6 +54,11 @@ public class StereoScene extends Scene3D {
    * Pixel coordinates on the camera screens of the point to be computed
    */
   protected Vector2f leftScreenCoords, rightScreenCoords;
+
+  /**
+   * Matrices for camera projection
+   */
+  private Matrices matrix = new Matrices();
 
   public StereoScene() {
     assetManager = null;
@@ -215,4 +222,24 @@ public class StereoScene extends Scene3D {
   private float degrees2Radiens(float angleDegrees) {
     return angleDegrees / 180.0f * FastMath.PI;
   }
+
+  /**
+   * Error function
+   */
+  private double getDerivativeErrorFunction() {
+    Vector4f initP = new Vector4f(0, 0, 0, 1);
+    double stepSize = 1*10^-7;
+    Vector4f leftScreenCoordidnates = new Vector4f(leftScreenCoords.x, leftScreenCoords.y, 0, 0);
+    Vector4f rightScreenCoordidnates = new Vector4f(rightScreenCoords.x, rightScreenCoords.y, 0, 0);
+
+    //
+    Matrix4f cameraProjetctionMatrix = matrix.createViewMatrixCamA().mult(matrix.createProjectionMatrix(true)).mult(matrix.createScreenMappingMatrix(true));
+
+    Vector4f forward_diff_x = cameraProjetctionMatrix.mult(new Vector4f((float) (initP.x + stepSize), initP.y, initP.z, initP.w)).subtract(cameraProjetctionMatrix.mult(initP));
+  }
+
+  private double gradientProcess() {
+    return 0;
+  }
+
 }

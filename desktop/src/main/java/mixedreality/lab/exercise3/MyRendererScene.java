@@ -19,6 +19,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import mixedreality.lab.exercise5.StereoScene;
 
 import static mixedreality.base.math.ConvexHull2D.cross;
 
@@ -54,7 +55,7 @@ public class MyRendererScene extends Scene2D {
 
         ObjReader reader = new ObjReader();
         //mesh = reader.read("models/cube.obj");
-        mesh = reader.read("Models/deer.obj");
+        //mesh = reader.read("Models/deer.obj");
 
         setupListeners();
     }

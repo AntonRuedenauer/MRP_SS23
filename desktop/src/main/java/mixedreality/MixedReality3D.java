@@ -19,10 +19,10 @@ public class MixedReality3D extends CG3DApplication {
   public MixedReality3D() {
 
     // Assignment 5
-    //setScene3D(new StereoScene());
+    setScene3D(new StereoScene());
 
     // Assignment 7
-    setScene3D(new MarchingCubesScene3D());
+    //setScene3D(new MarchingCubesScene3D());
   }
 
   public static void main(String[] args) {
@@ -30,7 +30,7 @@ public class MixedReality3D extends CG3DApplication {
     var app = new MixedReality3D();
     AppSettings appSettings = new AppSettings(true);
     appSettings.setTitle("Intro to Computer Graphics");
-    appSettings.setResolution(800, 600);
+    appSettings.setResolution(2400, 1600);
     appSettings.setFullscreen(false);
     appSettings.setAudioRenderer(null);
     app.setSettings(appSettings);
