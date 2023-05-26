@@ -6,10 +6,14 @@ import com.jme3.math.Matrix4f;
 import com.jme3.math.Vector3f;
 import com.jme3.math.Vector4f;
 import mixedreality.lab.exercise5.StereoScene;
+import org.opencv.core.Mat;
 
 public class Matrices {
 
-    private StereoScene stereoCam = new StereoScene();
+    private StereoScene stereoCam;
+    public Matrices (StereoScene stereoCam) {
+        this.stereoCam = stereoCam;
+    }
 
     /**
      * ViewMatrix for left camera

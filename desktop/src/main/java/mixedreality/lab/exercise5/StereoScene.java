@@ -58,7 +58,7 @@ public class StereoScene extends Scene3D {
   /**
    * Matrices for camera projection
    */
-  private Matrices matrix = new Matrices();
+  private Matrices matrix = new Matrices(this);
 
   public StereoScene() {
     assetManager = null;
