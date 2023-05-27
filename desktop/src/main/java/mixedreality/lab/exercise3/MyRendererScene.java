@@ -19,7 +19,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import mixedreality.lab.exercise5.StereoScene;
 
 import static mixedreality.base.math.ConvexHull2D.cross;
 
