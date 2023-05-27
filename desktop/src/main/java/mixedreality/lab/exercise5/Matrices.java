@@ -6,12 +6,14 @@ import com.jme3.math.Matrix4f;
 import com.jme3.math.Vector3f;
 import com.jme3.math.Vector4f;
 import mixedreality.lab.exercise5.StereoScene;
+import org.opencv.core.Mat;
+
 public class Matrices {
 
     private StereoScene stereoCam;
-   Matrices(StereoScene obj) {
-       this.stereoCam = obj;
-   }
+    public Matrices (StereoScene stereoCam) {
+        this.stereoCam = stereoCam;
+    }
 
     /**
      * ViewMatrix for left camera
@@ -42,7 +44,7 @@ public class Matrices {
     }
 
     /**
-     * Screen map matrix. Takes parameter if left or right cam
+     * Screenmap matrix. Takes parameter if left or right cam
      */
     public Matrix4f createScreenMappingMatrix(boolean rightCamera) {
         // Set up the screenMapping matrix and transform point
