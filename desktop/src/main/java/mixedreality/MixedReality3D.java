@@ -30,7 +30,7 @@ public class MixedReality3D extends CG3DApplication {
     var app = new MixedReality3D();
     AppSettings appSettings = new AppSettings(true);
     appSettings.setTitle("Intro to Computer Graphics");
-    appSettings.setResolution(2400, 1600);
+    appSettings.setResolution(800, 560);
     appSettings.setFullscreen(false);
     appSettings.setAudioRenderer(null);
     app.setSettings(appSettings);

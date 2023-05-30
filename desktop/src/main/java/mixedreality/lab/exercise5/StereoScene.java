@@ -232,8 +232,11 @@ public class StereoScene extends Scene3D {
   private Vector3f getDerivativeErrorFunction(Vector3f pointP) {
     double derivativeStepSize = Math.pow(10, -3);
 
-    Vector4f pointPTransformedLeft = matrixTransformer.transformOnePoint(pointP, leftCamera);
-    Vector4f pointPTransformedRight = matrixTransformer.transformOnePoint(pointP, rightCamera);
+    Vector3f pointPTransformedLeft = matrixTransformer.transformOnePoint(pointP, leftCamera);
+    Vector3f pointPTransformedRight = matrixTransformer.transformOnePoint(pointP, rightCamera);
+
+    System.out.println("base left: x: "+ pointP.x + " y: " + pointP.y);
+    System.out.println("transformed left: x: "+ pointPTransformedLeft.x + " y: " + pointPTransformedLeft.y);
 
     // Calculate error
     Vector2f vectorLeft = new Vector2f(leftScreenCoords.x - pointPTransformedLeft.x, leftScreenCoords.y - pointPTransformedLeft.y);

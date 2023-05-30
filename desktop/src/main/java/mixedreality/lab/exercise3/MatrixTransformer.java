@@ -8,39 +8,36 @@ import mixedreality.base.mesh.TriangleMesh;
 
 public class MatrixTransformer {
 
-    public Vector4f transformOnePoint(Vector3f vector, Camera camera) {
-        Vector4f returnVector = createModelMatrix(vector);
+    public Vector3f transformOnePoint(Vector3f vector, Camera camera) {
+        Vector3f returnVector = createModelMatrix(vector);
         returnVector = createViewMatrix(camera, returnVector);
         returnVector = createProjectionMatrix(returnVector);
-        return createScreenMappingMatrix(returnVector, camera);
+        returnVector = createScreenMappingMatrix(returnVector, camera);
+        return returnVector;
     }
 
-    public Vector4f createModelMatrix(Vector3f vector) {
+    public Vector3f createModelMatrix(Vector3f vector) {
         Matrix4f matrix4f = new Matrix4f().IDENTITY;
-        return transform(matrix4f.mult(vector));
+        return matrix4f.mult(vector);
     }
 
-    public Vector4f createViewMatrix(Camera camera, Vector4f vector) {
+    public Vector3f createViewMatrix(Camera camera, Vector3f vector) {
         // Set up the view matrix and transform points
         Matrix4f viewMatrix = getViewMatrix(camera.getEye(), camera.getRef(), camera.getUp());
         return viewMatrix.mult(vector);
     }
 
-    public Vector4f createProjectionMatrix(Vector4f vector) {
+    public Vector3f createProjectionMatrix(Vector3f vector) {
         // Set up the projection matrix and transform points
         Matrix4f projMatrix = getProjectionMatrix();
-        Vector4f pbild = projMatrix.mult(vector);
+        Vector3f pbild = projMatrix.mult(vector);
         return pbild.divide(pbild.z);
     }
 
-    public Vector4f createScreenMappingMatrix(Vector4f vector, Camera camera) {
+    public Vector3f createScreenMappingMatrix(Vector3f vector, Camera camera) {
         // Set up the screenMapping matrix and transform points
         Matrix4f screenMapMatrix = getScreenMapMatrix(camera);
         return screenMapMatrix.mult(vector);
-    }
-
-    private Vector4f transform(Vector3f old) {
-        return new Vector4f(old.x, old.y, old.z, 0);
     }
 
     private Matrix4f getViewMatrix(Vector3f eye, Vector3f ref, Vector3f up) {
@@ -57,11 +54,10 @@ public class MatrixTransformer {
 
     private Matrix4f getProjectionMatrix() {
         int z0 = 1;
-        Matrix4f projectionMatrix = new Matrix4f(1, 0, 0, 0,
+        return new Matrix4f(1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
-                0, 0, 1 / z0, 0);
-        return projectionMatrix;
+                0, 0, (float) 1 / z0, 0);
     }
 
     private Matrix4f getScreenMapMatrix(Camera camera) {
