@@ -10,10 +10,10 @@ import org.opencv.core.Mat;
 
 public class Matrices {
 
-    private StereoScene stereoCam;
-    public Matrices (StereoScene stereoCam) {
-        this.stereoCam = stereoCam;
-    }
+    private StereoScene stereoCam = new StereoScene();
+//    public Matrices (StereoScene stereoCam) {
+//        this.stereoCam = stereoCam;
+//    }
 
     /**
      * ViewMatrix for left camera

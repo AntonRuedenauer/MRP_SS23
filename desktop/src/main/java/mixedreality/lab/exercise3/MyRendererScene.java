@@ -54,13 +54,14 @@ public class MyRendererScene extends Scene2D {
 
         ObjReader reader = new ObjReader();
         //mesh = reader.read("models/cube.obj");
-        //mesh = reader.read("Models/deer.obj");
+        mesh = reader.read("Models/deer.obj");
 
         setupListeners();
     }
 
     @Override
     public void paint(Graphics g) {
+        g.clearRect(0, 0, getWidth(), getHeight());
         Graphics2D g2 = (Graphics2D) g;
         g2.setColor(Color.BLUE);
 
