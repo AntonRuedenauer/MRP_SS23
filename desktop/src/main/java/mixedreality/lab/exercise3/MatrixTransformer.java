@@ -16,28 +16,30 @@ public class MatrixTransformer {
         return returnVector;
     }
 
-    public Vector3f createModelMatrix(Vector3f vector) {
+    public Vector3f createModelMatrix (Vector3f vector3f) {
+        // Set up the model matrix and transform points
         Matrix4f matrix4f = new Matrix4f().IDENTITY;
-        return matrix4f.mult(vector);
+        return matrix4f.mult(vector3f);
     }
 
-    public Vector3f createViewMatrix(Camera camera, Vector3f vector) {
+    public Vector3f createViewMatrix(Camera camera, Vector3f vector3f) {
         // Set up the view matrix and transform points
         Matrix4f viewMatrix = getViewMatrix(camera.getEye(), camera.getRef(), camera.getUp());
-        return viewMatrix.mult(vector);
+        return viewMatrix.mult(vector3f);
     }
 
-    public Vector3f createProjectionMatrix(Vector3f vector) {
+    public Vector3f createProjectionMatrix(Vector3f vector3f) {
         // Set up the projection matrix and transform points
         Matrix4f projMatrix = getProjectionMatrix();
-        Vector3f pbild = projMatrix.mult(vector);
-        return pbild.divide(pbild.z);
+        Vector3f pbild1 = projMatrix.mult(vector3f);
+        pbild1.divide(pbild1.z);
+        return pbild1;
     }
 
-    public Vector3f createScreenMappingMatrix(Vector3f vector, Camera camera) {
+    public Vector3f createScreenMappingMatrix(Vector3f vector3f, Camera camera) {
         // Set up the screenMapping matrix and transform points
         Matrix4f screenMapMatrix = getScreenMapMatrix(camera);
-        return screenMapMatrix.mult(vector);
+        return screenMapMatrix.mult(vector3f);
     }
 
     private Matrix4f getViewMatrix(Vector3f eye, Vector3f ref, Vector3f up) {
@@ -54,16 +56,17 @@ public class MatrixTransformer {
 
     private Matrix4f getProjectionMatrix() {
         int z0 = 1;
-        return new Matrix4f(1, 0, 0, 0,
+        Matrix4f projectionMatrix = new Matrix4f(1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
-                0, 0, (float) 1 / z0, 0);
+                0, 0, 1/z0, 0);
+        return projectionMatrix;
     }
 
     private Matrix4f getScreenMapMatrix(Camera camera) {
         float f = camera.getWidth() / 2 * FastMath.tan(camera.getFovX() / 2);
-        Matrix4f screenMapMatrix = new Matrix4f(f, 0, 0, camera.getWidth() / 2,
-                0, f, 0, camera.getHeight() / 2,
+        Matrix4f screenMapMatrix = new Matrix4f(f, 0, 0, camera.getWidth()/2,
+                0, f, 0, camera.getHeight()/2,
                 0, 0, 0, 0,
                 0, 0, 0, 0);
         return screenMapMatrix;
