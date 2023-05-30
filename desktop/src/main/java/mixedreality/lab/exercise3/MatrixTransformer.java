@@ -8,47 +8,39 @@ import mixedreality.base.mesh.TriangleMesh;
 
 public class MatrixTransformer {
 
-    public Vector4f[] createModelMatrix(TriangleMesh triangleMesh, int i) {
-        // Set up the model matrix and transform points
+    public Vector4f transformOnePoint(Vector3f vector, Camera camera) {
+        Vector4f returnVector = createModelMatrix(vector);
+        returnVector = createViewMatrix(camera, returnVector);
+        returnVector = createProjectionMatrix(returnVector);
+        return createScreenMappingMatrix(returnVector, camera);
+    }
+
+    public Vector4f createModelMatrix(Vector3f vector) {
         Matrix4f matrix4f = new Matrix4f().IDENTITY;
-        Vector4f pwelt1 = transform(matrix4f.mult(triangleMesh.getVertex(triangleMesh.getTriangle(i).getA()).getPosition()));
-        Vector4f pwelt2 = transform(matrix4f.mult(triangleMesh.getVertex(triangleMesh.getTriangle(i).getB()).getPosition()));
-        Vector4f pwelt3 = transform(matrix4f.mult(triangleMesh.getVertex(triangleMesh.getTriangle(i).getC()).getPosition()));
-        return new Vector4f[]{pwelt1, pwelt2, pwelt3};
+        return transform(matrix4f.mult(vector));
+    }
+
+    public Vector4f createViewMatrix(Camera camera, Vector4f vector) {
+        // Set up the view matrix and transform points
+        Matrix4f viewMatrix = getViewMatrix(camera.getEye(), camera.getRef(), camera.getUp());
+        return viewMatrix.mult(vector);
+    }
+
+    public Vector4f createProjectionMatrix(Vector4f vector) {
+        // Set up the projection matrix and transform points
+        Matrix4f projMatrix = getProjectionMatrix();
+        Vector4f pbild = projMatrix.mult(vector);
+        return pbild.divide(pbild.z);
+    }
+
+    public Vector4f createScreenMappingMatrix(Vector4f vector, Camera camera) {
+        // Set up the screenMapping matrix and transform points
+        Matrix4f screenMapMatrix = getScreenMapMatrix(camera);
+        return screenMapMatrix.mult(vector);
     }
 
     private Vector4f transform(Vector3f old) {
         return new Vector4f(old.x, old.y, old.z, 0);
-    }
-
-    public Vector4f[] createViewMatrix(Camera camera, Vector4f[] arr) {
-        // Set up the view matrix and transform points
-        Matrix4f viewMatrix = getViewMatrix(camera.getEye(), camera.getRef(), camera.getUp());
-        Vector4f pcam1 = viewMatrix.mult(arr[0]);
-        Vector4f pcam2 = viewMatrix.mult(arr[1]);
-        Vector4f pcam3 = viewMatrix.mult(arr[2]);
-        return new Vector4f[]{pcam1, pcam2, pcam3};
-    }
-
-    public Vector4f[] createProjectionMatrix(Vector4f[] arr) {
-        // Set up the projection matrix and transform points
-        Matrix4f projMatrix = getProjectionMatrix();
-        Vector4f pbild1 = projMatrix.mult(arr[0]);
-        Vector4f pbild2 = projMatrix.mult(arr[1]);
-        Vector4f pbild3 = projMatrix.mult(arr[2]);
-        pbild1.divide(pbild1.z);
-        pbild2.divide(pbild2.z);
-        pbild3.divide(pbild3.z);
-        return new Vector4f[]{pbild1, pbild2, pbild3};
-    }
-
-    public Vector4f[] createScreenMappingMatrix(Vector4f[] arr, Camera camera) {
-        // Set up the screenMapping matrix and transform points
-        Matrix4f screenMapMatrix = getScreenMapMatrix(camera);
-        Vector4f ppixel1 = screenMapMatrix.mult(arr[0]);
-        Vector4f ppixel2 = screenMapMatrix.mult(arr[1]);
-        Vector4f ppixel3 = screenMapMatrix.mult(arr[2]);
-        return new Vector4f[]{ppixel1, ppixel2, ppixel3};
     }
 
     private Matrix4f getViewMatrix(Vector3f eye, Vector3f ref, Vector3f up) {

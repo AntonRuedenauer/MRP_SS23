@@ -66,11 +66,10 @@ public class MyRendererScene extends Scene2D {
 
         if (mesh != null) {
             for (int i = 0; i < mesh.getNumberOfTriangles(); i++) {
-                Vector4f[] modelMatrix = math.createModelMatrix(mesh, i);
-                Vector4f[] viewMatrix = math.createViewMatrix(camera, modelMatrix);
-                Vector4f[] projectionMatrix = math.createProjectionMatrix(viewMatrix);
-                Vector4f[] screenMappingMatrix = math.createScreenMappingMatrix(projectionMatrix, camera);
-                drawTriangle(g2, screenMappingMatrix[0], screenMappingMatrix[1], screenMappingMatrix[2]);
+                drawTriangle(g2, math.transformOnePoint(
+                                mesh.getVertex(mesh.getTriangle(i).getA()).getPosition(), camera),
+                        math.transformOnePoint(mesh.getVertex(mesh.getTriangle(i).getB()).getPosition(), camera),
+                        math.transformOnePoint(mesh.getVertex(mesh.getTriangle(i).getC()).getPosition(), camera));
             }
         }
     }
