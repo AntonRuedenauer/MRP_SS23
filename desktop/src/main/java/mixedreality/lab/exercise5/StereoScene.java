@@ -227,75 +227,44 @@ public class StereoScene extends Scene3D {
    */
   private Vector3f getDerivativeErrorFunction(Vector3f pointP) {
     float derivativeStepSize = (float) Math.pow(10, -3);
+    float stepX = pointP.x + derivativeStepSize;
+    float stepY = pointP.y + derivativeStepSize;
+    float stepZ = pointP.z + derivativeStepSize;
 
-    // Quotient of difference of each parameter x, y and z
     // Transform with derivative step size in pixel coordinates
-    Vector3f pointPTransformedLeftX = matrixTransformer.transformOnePoint(new Vector3f(pointP.x + derivativeStepSize, pointP.y, pointP.z), leftCamera);
-    Vector3f pointPTransformedRightX = matrixTransformer.transformOnePoint(new Vector3f(pointP.x + derivativeStepSize, pointP.y, pointP.z), rightCamera);
-
-    Vector3f pointPTransformedLeftY = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y + derivativeStepSize, pointP.z), leftCamera);
-    Vector3f pointPTransformedRightY = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y + derivativeStepSize, pointP.z), rightCamera);
-
-    Vector3f pointPTransformedLeftZ = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y, pointP.z + derivativeStepSize), leftCamera);
-    Vector3f pointPTransformedRightZ = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y, pointP.z + derivativeStepSize), rightCamera);
+    Vector3f pointPTransformedLeftX = transformPoint(stepX, pointP.y, pointP.z);
+    Vector3f pointPTransformedRightX = transformPoint(stepX, pointP.y, pointP.z);
+    Vector3f pointPTransformedLeftY = transformPoint(pointP.x, stepY, pointP.z);
+    Vector3f pointPTransformedRightY = transformPoint(pointP.x, stepY, pointP.z);
+    Vector3f pointPTransformedLeftZ = transformPoint(pointP.x, pointP.y, stepZ);
+    Vector3f pointPTransformedRightZ = transformPoint(pointP.x, pointP.y, stepZ);
 
     // Transform without derivative step size in pixel coordinates
-    Vector3f pointPTransformedLeftXW = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y, pointP.z), leftCamera);
-    Vector3f pointPTransformedRightXW = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y, pointP.z), rightCamera);
+    Vector3f pointPTransformedLeft = transformPoint(pointP.x, pointP.y, pointP.z);
+    Vector3f pointPTransformedRight = transformPoint(pointP.x, pointP.y, pointP.z);
 
-    Vector3f pointPTransformedLeftYW = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y, pointP.z), leftCamera);
-    Vector3f pointPTransformedRightYW = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y, pointP.z), rightCamera);
+    // Calculate error of derivative x, y, and z with and without the step size
+    float derivativeX = calculateDerivative(pointPTransformedLeftX, pointPTransformedRightX, pointPTransformedLeft, pointPTransformedRight, derivativeStepSize);
+    float derivativeY = calculateDerivative(pointPTransformedLeftY, pointPTransformedRightY, pointPTransformedLeft, pointPTransformedRight, derivativeStepSize);
+    float derivativeZ = calculateDerivative(pointPTransformedLeftZ, pointPTransformedRightZ, pointPTransformedLeft, pointPTransformedRight, derivativeStepSize);
 
-    Vector3f pointPTransformedLeftZW = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y, pointP.z), leftCamera);
-    Vector3f pointPTransformedRightZW = matrixTransformer.transformOnePoint(new Vector3f(pointP.x, pointP.y, pointP.z), rightCamera);
-
-    // With step size
-    Vector2f vectorLeftX = new Vector2f(leftScreenCoords.x - pointPTransformedLeftX.x, leftScreenCoords.y - pointPTransformedLeftX.y);
-    Vector2f vectorRightX = new Vector2f(rightScreenCoords.x - pointPTransformedRightX.x, rightScreenCoords.y - pointPTransformedRightX.y);
-
-    Vector2f vectorLeftY = new Vector2f(leftScreenCoords.x - pointPTransformedLeftY.x, leftScreenCoords.y - pointPTransformedLeftY.y);
-    Vector2f vectorRightY = new Vector2f(rightScreenCoords.x - pointPTransformedRightY.x, rightScreenCoords.y - pointPTransformedRightY.y);
-
-    Vector2f vectorLeftZ = new Vector2f(leftScreenCoords.x - pointPTransformedLeftZ.x, leftScreenCoords.y - pointPTransformedLeftZ.y);
-    Vector2f vectorRightZ = new Vector2f(rightScreenCoords.x - pointPTransformedRightZ.x, rightScreenCoords.y - pointPTransformedRightZ.y);
-
-    // Without step size
-    Vector2f vectorLeftXW = new Vector2f(leftScreenCoords.x - pointPTransformedLeftXW.x, leftScreenCoords.y - pointPTransformedLeftXW.y);
-    Vector2f vectorRightXW = new Vector2f(rightScreenCoords.x - pointPTransformedRightXW.x, rightScreenCoords.y - pointPTransformedRightXW.y);
-
-    Vector2f vectorLeftYW = new Vector2f(leftScreenCoords.x - pointPTransformedLeftYW.x, leftScreenCoords.y - pointPTransformedLeftYW.y);
-    Vector2f vectorRightYW = new Vector2f(rightScreenCoords.x - pointPTransformedRightYW.x, rightScreenCoords.y - pointPTransformedRightYW.y);
-
-    Vector2f vectorLeftZW = new Vector2f(leftScreenCoords.x - pointPTransformedLeftZW.x, leftScreenCoords.y - pointPTransformedLeftZW.y);
-    Vector2f vectorRightZW = new Vector2f(rightScreenCoords.x - pointPTransformedRightZW.x, rightScreenCoords.y - pointPTransformedRightZW.y);
-
-    // Calculate error of derivative x, y and z with and without the step size
-    // x with
-    float sumOfLengthSquaredX = vectorLeftX.length() + vectorRightX.length();
-    // y with
-    float sumOfLengthSquaredY = vectorLeftY.length() + vectorRightY.length();
-    // z with
-    float sumOfLengthSquaredZ = vectorLeftZ.length() + vectorRightZ.length();
-    // x without
-    float sumOfLengthSquaredXW = vectorLeftXW.length() + vectorRightXW.length();
-    // y without
-    float sumOfLengthSquaredYW = vectorLeftYW.length() + vectorRightYW.length();
-    // z without
-    float sumOfLengthSquaredZW = vectorLeftZW.length() + vectorRightZW.length();
-
-    // Calculate error
-    // x
-    double derivativeX = ((sumOfLengthSquaredX) - sumOfLengthSquaredXW) / derivativeStepSize;
-    // y
-    double derivativeY =  ((sumOfLengthSquaredY) - sumOfLengthSquaredYW) / derivativeStepSize;
-    // z
-    double derivativeZ =  ((sumOfLengthSquaredZ) - sumOfLengthSquaredZW) / derivativeStepSize;
-
-    return new Vector3f((float) derivativeX, (float) derivativeY, (float) derivativeZ);
+    return new Vector3f(derivativeX, derivativeY, derivativeZ);
   }
 
-//  public Vector3f transformWithRenderPipeline(Vector3f vector, Camera camera) {
-//  }
+  private Vector3f transformPoint(float x, float y, float z) {
+    return matrixTransformer.transformOnePoint(new Vector3f(x, y, z), leftCamera);
+  }
+
+  private float calculateDerivative(Vector3f pointLeft, Vector3f pointRight, Vector3f pointLeftW, Vector3f pointRightW, float stepSize) {
+    float sumOfLengthSquared = calculateLengthSquared(pointLeft) + calculateLengthSquared(pointRight);
+    float sumOfLengthSquaredW = calculateLengthSquared(pointLeftW) + calculateLengthSquared(pointRightW);
+    return (sumOfLengthSquared - sumOfLengthSquaredW) / stepSize;
+  }
+
+  private float calculateLengthSquared(Vector3f point) {
+    Vector2f vector = new Vector2f(leftScreenCoords.x - point.x, leftScreenCoords.y - point.y);
+    return vector.length();
+  }
 
   private Vector3f getApproxOfPoint() {
     Vector3f approxPoint = new Vector3f(0, 0, 0);
