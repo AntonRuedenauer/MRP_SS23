@@ -239,7 +239,7 @@ public class StereoScene extends Scene3D {
     /**
      * Transformation of point P and derivative of error function
      */
-    private Vector3f getDerivativeErrorFunction(Vector3f pointP) {
+    public Vector3f getDerivativeErrorFunction(Vector3f pointP) {
         float derivativeStepSize = (float) Math.pow(10, -3);
         float stepX = pointP.x + derivativeStepSize;
         float stepY = pointP.y + derivativeStepSize;
@@ -269,13 +269,13 @@ public class StereoScene extends Scene3D {
         return new Vector2f[]{pointPTransformedX, pointPTransformedY, pointPTransformedZ};
     }
 
-    private float calculateDerivative(Vector2f pointLeft, Vector2f pointRight, Vector2f pointLeftW, Vector2f pointRightW, float stepSize) {
+    public float calculateDerivative(Vector2f pointLeft, Vector2f pointRight, Vector2f pointLeftW, Vector2f pointRightW, float stepSize) {
         float sumOfLengthSquared = calculateLengthSquared(pointLeft, leftScreenCoords) + calculateLengthSquared(pointRight, rightScreenCoords);
         float sumOfLengthSquaredW = calculateLengthSquared(pointLeftW, leftScreenCoords) + calculateLengthSquared(pointRightW, rightScreenCoords);
         return (sumOfLengthSquared - sumOfLengthSquaredW) / stepSize;
     }
 
-    private float calculateLengthSquared(Vector2f point, Vector2f screenCoords) {
+    public float calculateLengthSquared(Vector2f point, Vector2f screenCoords) {
         return new Vector2f(screenCoords.x - point.x, screenCoords.y - point.y).length();
     }
 
