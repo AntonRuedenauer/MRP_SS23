@@ -41,6 +41,8 @@ dependencies {
     implementation 'org.json:json:20211205'
     implementation 'org.jetbrains:annotations:22.0.0'
     implementation 'com.google.guava:guava:31.0.1-jre'
+    implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    implementation 'junit:junit:4.13.1'
 
     // Unit-Testing
     testImplementation('org.junit.jupiter:junit-jupiter:5.8.2')
