@@ -61,6 +61,7 @@ public class MyRendererScene extends Scene2D {
 
     @Override
     public void paint(Graphics g) {
+        g.clearRect(0, 0, getWidth(), getHeight());
         Graphics2D g2 = (Graphics2D) g;
         g2.setColor(Color.BLUE);
 
