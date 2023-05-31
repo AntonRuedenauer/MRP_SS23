@@ -68,14 +68,14 @@ public class MyRendererScene extends Scene2D {
         if (mesh != null) {
             for (int i = 0; i < mesh.getNumberOfTriangles(); i++) {
                 drawTriangle(g2,
-                        math.transformOnePoint(mesh.getVertex(mesh.getTriangle(i).getA()).getPosition(), camera),
-                        math.transformOnePoint(mesh.getVertex(mesh.getTriangle(i).getB()).getPosition(), camera),
-                        math.transformOnePoint(mesh.getVertex(mesh.getTriangle(i).getC()).getPosition(), camera));
+                        math.renderingPipeline(mesh.getVertex(mesh.getTriangle(i).getA()).getPosition(), camera),
+                        math.renderingPipeline(mesh.getVertex(mesh.getTriangle(i).getB()).getPosition(), camera),
+                        math.renderingPipeline(mesh.getVertex(mesh.getTriangle(i).getC()).getPosition(), camera));
             }
         }
     }
 
-    private void drawTriangle(Graphics2D g2, Vector3f ppixel1, Vector3f ppixel2, Vector3f ppixel3) {
+    private void drawTriangle(Graphics2D g2, Vector2f ppixel1, Vector2f ppixel2, Vector2f ppixel3) {
         if (!backfaceCulling) {
             // Draw line
             drawLine(g2, new Vector2f(ppixel1.x, ppixel1.y), new Vector2f(ppixel2.x, ppixel2.y), g2.getColor());
@@ -87,8 +87,8 @@ public class MyRendererScene extends Scene2D {
         }
     }
 
-    private boolean triangleIsClockwise(Vector3f p1, Vector3f p2, Vector3f p3) {
-        return cross(new Vector2f(p1.x, p1.y), new Vector2f(p2.x, p2.y), new Vector2f(p3.x, p3.y)) < 0;
+    private boolean triangleIsClockwise(Vector2f p1, Vector2f p2, Vector2f p3) {
+        return cross(p1, p2, p3) < 0;
     }
 
     @Override

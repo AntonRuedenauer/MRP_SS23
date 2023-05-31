@@ -1,12 +1,42 @@
 package mixedreality.lab.exercise3;
 
-import com.jme3.math.FastMath;
-import com.jme3.math.Matrix4f;
-import com.jme3.math.Vector3f;
-import com.jme3.math.Vector4f;
+import com.jme3.math.*;
 import mixedreality.base.mesh.TriangleMesh;
 
 public class MatrixTransformer {
+
+
+    public Vector2f renderingPipeline(Vector3f projectionCoords, Camera camera) {
+        // Modell-Tranformation
+        Matrix4f M = new Matrix4f();
+
+        // View-Tranformation
+        Matrix4f cameraMatrix = camera.makeCameraMatrix();
+        Matrix4f V = cameraMatrix.invert();
+
+        // Perspektivische Transformation
+        Matrix4f P = new Matrix4f(
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 1/camera.getZ0(), 0
+        );
+
+        //Pixel-Transformation
+        float f = (float) (camera.getWidth() / (2 * Math.tan(camera.getFovX() / 2)));
+        Matrix4f K = new Matrix4f(
+                f, 0, 0, camera.getWidth()/2f,
+                0, f, 0, camera.getHeight()/2f,
+                0,0,0,0,
+                0,0,0,0
+        );
+        Vector4f pBild = P.mult(V.mult(M.mult(new Vector4f(projectionCoords.x, projectionCoords.y, projectionCoords.z, 1))));
+        Vector4f toPixel = K.mult(pBild.divide(pBild.w));
+
+        return new Vector2f(toPixel.x, toPixel.y);
+    }
+
+    // OLD:
 
     public Vector3f transformOnePoint(Vector3f vector, Camera camera) {
         Vector3f returnVector = createModelMatrix(vector);
