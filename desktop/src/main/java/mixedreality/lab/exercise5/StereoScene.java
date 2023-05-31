@@ -232,16 +232,16 @@ public class StereoScene extends Scene3D {
     float stepZ = pointP.z + derivativeStepSize;
 
     // Transform with derivative step size in pixel coordinates
-    Vector3f pointPTransformedLeftX = transformPoint(stepX, pointP.y, pointP.z);
-    Vector3f pointPTransformedRightX = transformPoint(stepX, pointP.y, pointP.z);
-    Vector3f pointPTransformedLeftY = transformPoint(pointP.x, stepY, pointP.z);
-    Vector3f pointPTransformedRightY = transformPoint(pointP.x, stepY, pointP.z);
-    Vector3f pointPTransformedLeftZ = transformPoint(pointP.x, pointP.y, stepZ);
-    Vector3f pointPTransformedRightZ = transformPoint(pointP.x, pointP.y, stepZ);
+    Vector3f pointPTransformedLeftX = transformPoint(stepX, pointP.y, pointP.z, leftCamera);
+    Vector3f pointPTransformedRightX = transformPoint(stepX, pointP.y, pointP.z, rightCamera);
+    Vector3f pointPTransformedLeftY = transformPoint(pointP.x, stepY, pointP.z, leftCamera);
+    Vector3f pointPTransformedRightY = transformPoint(pointP.x, stepY, pointP.z, rightCamera);
+    Vector3f pointPTransformedLeftZ = transformPoint(pointP.x, pointP.y, stepZ, leftCamera);
+    Vector3f pointPTransformedRightZ = transformPoint(pointP.x, pointP.y, stepZ, rightCamera);
 
     // Transform without derivative step size in pixel coordinates
-    Vector3f pointPTransformedLeft = transformPoint(pointP.x, pointP.y, pointP.z);
-    Vector3f pointPTransformedRight = transformPoint(pointP.x, pointP.y, pointP.z);
+    Vector3f pointPTransformedLeft = transformPoint(pointP.x, pointP.y, pointP.z, leftCamera);
+    Vector3f pointPTransformedRight = transformPoint(pointP.x, pointP.y, pointP.z, rightCamera);
 
     // Calculate error of derivative x, y, and z with and without the step size
     float derivativeX = calculateDerivative(pointPTransformedLeftX, pointPTransformedRightX, pointPTransformedLeft, pointPTransformedRight, derivativeStepSize);
@@ -251,8 +251,8 @@ public class StereoScene extends Scene3D {
     return new Vector3f(derivativeX, derivativeY, derivativeZ);
   }
 
-  private Vector3f transformPoint(float x, float y, float z) {
-    return matrixTransformer.transformOnePoint(new Vector3f(x, y, z), leftCamera);
+  private Vector3f transformPoint(float x, float y, float z, Camera camera) {
+    return matrixTransformer.transformOnePoint(new Vector3f(x, y, z), camera);
   }
 
   private float calculateDerivative(Vector3f pointLeft, Vector3f pointRight, Vector3f pointLeftW, Vector3f pointRightW, float stepSize) {
@@ -267,7 +267,7 @@ public class StereoScene extends Scene3D {
   }
 
   private Vector3f getApproxOfPoint() {
-    Vector3f approxPoint = new Vector3f(0, 0, 0);
+    Vector3f approxPoint = new Vector3f(1, 3, -1);
     float gradientStepSize = (float) Math.pow(10, -5);
     int iteraitves = 0;
     while (1000 > iteraitves) {
