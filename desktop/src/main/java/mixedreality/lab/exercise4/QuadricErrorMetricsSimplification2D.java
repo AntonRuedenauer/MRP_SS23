@@ -122,7 +122,7 @@ public class QuadricErrorMetricsSimplification2D {
      * Compute the result if the edge is collaped - this is used in the priority queue to select the next edge to
      * collapse.
      */
-    protected EdgeCollapse computeEdgeCollapseResult(PolygonEdge edge) {
+    public EdgeCollapse computeEdgeCollapseResult(PolygonEdge edge) {
         Matrix3f fehlerquadrik = add(computePointQem(edge.getStartVertex()), computePointQem(edge.getEndVertex()));
         Matrix3f fehlerquadrikAbgl =  fehlerquadrik.clone().setRow(2, new Vector3f(0, 0, 1));
 
