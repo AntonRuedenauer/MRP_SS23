@@ -7,6 +7,7 @@
 package mixedreality.lab.exercise6;
 
 import com.jme3.math.Vector2f;
+import org.apache.commons.lang3.ArrayUtils;
 import ui.Scene2D;
 
 import java.awt.*;
@@ -56,9 +57,19 @@ public class LSystemScene2D extends Scene2D {
      * Derive the axiom for the given number of iterations. The result of the
      * derivation must be saved in the variable currentWord.
      */
-    protected void derive() {
-        // Your task
-        currentWord = "";
+    public void derive() {
+        currentWord = this.axiom.toString();
+        for (int i=0; i < numIterations; i++) {
+            currentWord = replaceOneRuleset(currentWord);
+        }
+    }
+
+    public String replaceOneRuleset(String word) {
+        String localWord = word;
+        for (Character key : this.rules.keySet()) {
+            localWord = localWord.replace(key.toString(), this.rules.get(key));
+        }
+        return localWord;
     }
 
     @Override
