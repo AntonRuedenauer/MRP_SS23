@@ -21,6 +21,7 @@ public class Turtle {
 
     public  void  changeAngleBy(double degree) {
         this.angle = angle + degree;
+        this.angle = this.angle % 360;
     }
 
     public float getX() {
