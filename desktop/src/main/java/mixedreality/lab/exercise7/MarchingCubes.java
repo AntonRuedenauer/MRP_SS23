@@ -8,6 +8,7 @@ package mixedreality.lab.exercise7;
 
 import com.jme3.math.Vector3f;
 import mixedreality.base.mesh.TriangleMesh;
+import mixedreality.base.mesh.Vertex;
 import mixedreality.lab.exercise7.functions.ImplicitFunction;
 
 import java.util.Optional;
@@ -39,7 +40,39 @@ public class MarchingCubes {
      */
     public Optional<TriangleMesh> getMesh(Index8Bit index, float[] values, float isovalue) {
         // TODO
-        return Optional.empty();
+        int[] lookUpValues = findInLookUp(index);
+
+        if (lookUpValues[0] == -1) {
+            return Optional.empty();
+        }
+
+        TriangleMesh mesh = new TriangleMesh();
+
+        for (int i = 0; i < 15; i += 3) {
+            int edge1 = lookUpValues[i];
+            int edge2 = lookUpValues[i + 1];
+            int edge3 = lookUpValues[i + 2];
+
+            if (edge1 == -1 || edge2 == -1 || edge3 == -1) {
+                continue;
+            }
+
+            Vector3f vertex1 = getEdgePoint(edge1, values, isovalue);
+            Vector3f vertex2 = getEdgePoint(edge2, values, isovalue);
+            Vector3f vertex3 = getEdgePoint(edge3, values, isovalue);
+            int vertexIndex1 = mesh.addVertex(vertex1);
+            int vertexIndex2 = mesh.addVertex(vertex2);
+            int vertexIndex3 = mesh.addVertex(vertex3);
+            mesh.addTriangle(vertexIndex1, vertexIndex2, vertexIndex3);
+        }
+        return Optional.of(mesh);
+    }
+
+    public static int[] findInLookUp(Index8Bit index) {
+        int startIndex = index.toInt() * 15;
+        int[] values = new int[15];
+        System.arraycopy(faces, startIndex, values, 0, 15);
+        return values;
     }
 
     /**
@@ -53,8 +86,80 @@ public class MarchingCubes {
         // TODO
         TriangleMesh mesh = new TriangleMesh();
         mesh.computeTriangleNormals();
-        return mesh;
-    }
+
+        // Schritt 1: Bestimme Zellenseitenlängen
+        float cellSizeX = (ur.x - ll.x) / resX;
+        float cellSizeY = (ur.y - ll.y) / resY;
+        float cellSizeZ = (ur.z - ll.z) / resZ;
+
+        // Schritt 2: Erzeuge ein leeres TriangleMesh
+        TriangleMesh resultMesh = new TriangleMesh();
+
+        // Schritt 3: Durchlaufe das 3D-Gitter
+        for (int x = 0; x < resX; x++) {
+            for (int y = 0; y < resY; y++) {
+                for (int z = 0; z < resZ; z++) {
+                    // Schritt 4: Bestimme die Eckpunkte des aktuellen Würfels
+                    Vector3f v0 = new Vector3f(ll.x + x * cellSizeX, ll.y + y * cellSizeY, ll.z + z * cellSizeZ);
+                    Vector3f v1 = new Vector3f(ll.x + (x + 1) * cellSizeX, ll.y + y * cellSizeY, ll.z + z * cellSizeZ);
+                    Vector3f v2 = new Vector3f(ll.x + (x + 1) * cellSizeX, ll.y + (y + 1) * cellSizeY, ll.z + z * cellSizeZ);
+                    Vector3f v3 = new Vector3f(ll.x + x * cellSizeX, ll.y + (y + 1) * cellSizeY, ll.z + z * cellSizeZ);
+                    Vector3f v4 = new Vector3f(ll.x + x * cellSizeX, ll.y + y * cellSizeY, ll.z + (z + 1) * cellSizeZ);
+                    Vector3f v5 = new Vector3f(ll.x + (x + 1) * cellSizeX, ll.y + y * cellSizeY, ll.z + (z + 1) * cellSizeZ);
+                    Vector3f v6 = new Vector3f(ll.x + (x + 1) * cellSizeX, ll.y + (y + 1) * cellSizeY, ll.z + (z + 1) * cellSizeZ);
+                    Vector3f v7 = new Vector3f(ll.x + x * cellSizeX, ll.y + (y + 1) * cellSizeY, ll.z + (z + 1) * cellSizeZ);
+
+                    // Schritt 5: Bestimme die Funktionswerte der Eckpunkte
+                    float val0 = f.eval(v0) - isovalue;
+                    float val1 = f.eval(v1) - isovalue;
+                    float val2 = f.eval(v2) - isovalue;
+                    float val3 = f.eval(v3) - isovalue;
+                    float val4 = f.eval(v4) - isovalue;
+                    float val5 = f.eval(v5) - isovalue;
+                    float val6 = f.eval(v6) - isovalue;
+                    float val7 = f.eval(v7) - isovalue;
+                    float[] values = new float[8];
+                    values[0] = val0;
+                    values[1] = val1;
+                    values[2] = val2;
+                    values[3] = val3;
+                    values[4] = val4;
+                    values[5] = val5;
+                    values[6] = val6;
+                    values[7] = val7;
+
+                    Index8Bit index = new Index8Bit(
+                            (short) (val0 <= 0 ? 0 : 1),
+                            (short) (val1 <= 0 ? 0 : 1),
+                            (short) (val2 <= 0 ? 0 : 1),
+                            (short) (val3 <= 0 ? 0 : 1),
+                            (short) (val4 <= 0 ? 0 : 1),
+                            (short) (val5 <= 0 ? 0 : 1),
+                            (short) (val6 <= 0 ? 0 : 1),
+                            (short) (val7 <= 0 ? 0 : 1)
+                    );
+
+                    // Schritt 6: Erzeuge das Dreiecksnetz für den aktuellen Würfel
+                    Optional<TriangleMesh> cubeMesh = getMesh(index, values, 0);
+                    TriangleMesh scaledMesh = new TriangleMesh();
+                    // Schritt 7: Skaliere und verschiebe das Dreiecksnetz
+                    if (cubeMesh.isPresent()) {
+
+                        // Skalierung und Translation
+                        for (int i = 0; i < cubeMesh.get().getNumberOfTriangles(); i++) {
+                            Vertex vertex = cubeMesh.get().getVertex(i);
+                            Vector3f newVertex = vertex.getPosition().mult(new Vector3f(cellSizeX, cellSizeY, cellSizeZ));
+                            vertex.getPosition().add(new Vector3f(1, 2, 3));
+                            scaledMesh.addVertex(newVertex);
+                        }
+                    }
+                    resultMesh.unite(scaledMesh);
+                    }
+                }
+            }
+        resultMesh.flipTriangleOrientation();
+        return resultMesh;
+        }
 
     /**
      * Return the required point on the edge provided by the edgeIndex.
