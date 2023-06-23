@@ -29,6 +29,7 @@ public class MarchingCubes {
             new Vector3f(0.5f, -0.5f, -0.5f),
             new Vector3f(0.5f, -0.5f, 0.5f),
             new Vector3f(-0.5f, -0.5f, 0.5f),
+
             new Vector3f(-0.5f, 0.5f, -0.5f),
             new Vector3f(0.5f, 0.5f, -0.5f),
             new Vector3f(0.5f, 0.5f, 0.5f),
@@ -98,25 +99,30 @@ public class MarchingCubes {
         for (int x = 0; x < resX; x++) {
             for (int y = 0; y < resY; y++) {
                 for (int z = 0; z < resZ; z++) {
-                    // Schritt 4: Bestimme die Eckpunkte des aktuellen Würfels
-                    Vector3f v0 = new Vector3f(ll.x + x * cellSizeX, ll.y + y * cellSizeY, ll.z + z * cellSizeZ);
-                    Vector3f v1 = new Vector3f(ll.x + (x + 1) * cellSizeX, ll.y + y * cellSizeY, ll.z + z * cellSizeZ);
-                    Vector3f v2 = new Vector3f(ll.x + (x + 1) * cellSizeX, ll.y + (y + 1) * cellSizeY, ll.z + z * cellSizeZ);
-                    Vector3f v3 = new Vector3f(ll.x + x * cellSizeX, ll.y + (y + 1) * cellSizeY, ll.z + z * cellSizeZ);
-                    Vector3f v4 = new Vector3f(ll.x + x * cellSizeX, ll.y + y * cellSizeY, ll.z + (z + 1) * cellSizeZ);
-                    Vector3f v5 = new Vector3f(ll.x + (x + 1) * cellSizeX, ll.y + y * cellSizeY, ll.z + (z + 1) * cellSizeZ);
-                    Vector3f v6 = new Vector3f(ll.x + (x + 1) * cellSizeX, ll.y + (y + 1) * cellSizeY, ll.z + (z + 1) * cellSizeZ);
-                    Vector3f v7 = new Vector3f(ll.x + x * cellSizeX, ll.y + (y + 1) * cellSizeY, ll.z + (z + 1) * cellSizeZ);
+                    // v = vorne   u = unten  l = links
+                    // h = hinten  o = oben   r = rechts
+                    float px = ll.x + (x*cellSizeX);
+                    float py = ll.y + (y*cellSizeY);
+                    float pz = ll.z + (z*cellSizeZ);
 
+                    Vector3f vul = new Vector3f(px, py, pz);
+                    Vector3f vur = new Vector3f(px+cellSizeX, py, pz);
+                    Vector3f hur = new Vector3f(px+cellSizeX, py, pz+cellSizeZ);
+                    Vector3f hul = new Vector3f(px, py, pz+cellSizeZ);
+                    Vector3f vol = new Vector3f(px, py+cellSizeY, pz);
+                    Vector3f vor = new Vector3f(px+cellSizeX, py+cellSizeY, pz);
+                    Vector3f hor = new Vector3f(px+cellSizeX, py+cellSizeY, pz+cellSizeZ);
+                    Vector3f hol = new Vector3f(px, py+cellSizeY, pz+cellSizeZ);
+                    // Schritt 4: Bestimme die Eckpunkte des aktuellen Würfels
                     // Schritt 5: Bestimme die Funktionswerte der Eckpunkte
-                    float val0 = f.eval(v0);
-                    float val1 = f.eval(v1);
-                    float val2 = f.eval(v2);
-                    float val3 = f.eval(v3);
-                    float val4 = f.eval(v4);
-                    float val5 = f.eval(v5);
-                    float val6 = f.eval(v6);
-                    float val7 = f.eval(v7);
+                    float val0 = f.eval(vul);
+                    float val1 = f.eval(vur);
+                    float val2 = f.eval(hur);
+                    float val3 = f.eval(hul);
+                    float val4 = f.eval(vol);
+                    float val5 = f.eval(vor);
+                    float val6 = f.eval(hor);
+                    float val7 = f.eval(hol);
                     float[] values = new float[8];
                     values[0] = val0;
                     values[1] = val1;
@@ -143,13 +149,14 @@ public class MarchingCubes {
                     // Schritt 7: Skaliere und verschiebe das Dreiecksnetz
                     if (cubeMesh.isPresent()) {
                         scale(cubeMesh.get(), cellSizeX);
-                        translate(cubeMesh.get(), v0);
+                        translate(cubeMesh.get(), vul);
                         resultMesh.unite(cubeMesh.get());
                     }
                     }
                 }
             }
         resultMesh.computeTriangleNormals();
+        resultMesh.flipTriangleOrientation();
         return resultMesh;
         }
 
