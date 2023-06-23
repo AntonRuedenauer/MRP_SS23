@@ -13,6 +13,9 @@ import mixedreality.lab.exercise7.functions.ImplicitFunction;
 
 import java.util.Optional;
 
+import static mixedreality.base.mesh.TriangleMeshTools.scale;
+import static mixedreality.base.mesh.TriangleMeshTools.translate;
+
 /**
  * This class creates a triangle mesh for a given implicit function using the Marching Cubes algorithm.
  */
@@ -39,7 +42,6 @@ public class MarchingCubes {
      * Create a mesh for a single cube, given an 8-bit index.
      */
     public Optional<TriangleMesh> getMesh(Index8Bit index, float[] values, float isovalue) {
-        // TODO
         int[] lookUpValues = findInLookUp(index);
 
         if (lookUpValues[0] == -1) {
@@ -83,9 +85,6 @@ public class MarchingCubes {
     public TriangleMesh makeMesh(ImplicitFunction f, float isovalue,
                                  Vector3f ll, Vector3f ur,
                                  int resX, int resY, int resZ) {
-        // TODO
-        TriangleMesh mesh = new TriangleMesh();
-        mesh.computeTriangleNormals();
 
         // Schritt 1: Bestimme Zellenseitenlängen
         float cellSizeX = (ur.x - ll.x) / resX;
@@ -110,14 +109,14 @@ public class MarchingCubes {
                     Vector3f v7 = new Vector3f(ll.x + x * cellSizeX, ll.y + (y + 1) * cellSizeY, ll.z + (z + 1) * cellSizeZ);
 
                     // Schritt 5: Bestimme die Funktionswerte der Eckpunkte
-                    float val0 = f.eval(v0) - isovalue;
-                    float val1 = f.eval(v1) - isovalue;
-                    float val2 = f.eval(v2) - isovalue;
-                    float val3 = f.eval(v3) - isovalue;
-                    float val4 = f.eval(v4) - isovalue;
-                    float val5 = f.eval(v5) - isovalue;
-                    float val6 = f.eval(v6) - isovalue;
-                    float val7 = f.eval(v7) - isovalue;
+                    float val0 = f.eval(v0);
+                    float val1 = f.eval(v1);
+                    float val2 = f.eval(v2);
+                    float val3 = f.eval(v3);
+                    float val4 = f.eval(v4);
+                    float val5 = f.eval(v5);
+                    float val6 = f.eval(v6);
+                    float val7 = f.eval(v7);
                     float[] values = new float[8];
                     values[0] = val0;
                     values[1] = val1;
@@ -140,24 +139,17 @@ public class MarchingCubes {
                     );
 
                     // Schritt 6: Erzeuge das Dreiecksnetz für den aktuellen Würfel
-                    Optional<TriangleMesh> cubeMesh = getMesh(index, values, 0);
-                    TriangleMesh scaledMesh = new TriangleMesh();
+                    Optional<TriangleMesh> cubeMesh = getMesh(index, values, isovalue);
                     // Schritt 7: Skaliere und verschiebe das Dreiecksnetz
                     if (cubeMesh.isPresent()) {
-
-                        // Skalierung und Translation
-                        for (int i = 0; i < cubeMesh.get().getNumberOfTriangles(); i++) {
-                            Vertex vertex = cubeMesh.get().getVertex(i);
-                            Vector3f newVertex = vertex.getPosition().mult(new Vector3f(cellSizeX, cellSizeY, cellSizeZ));
-                            vertex.getPosition().add(new Vector3f(1, 2, 3));
-                            scaledMesh.addVertex(newVertex);
-                        }
+                        scale(cubeMesh.get(), cellSizeX);
+                        translate(cubeMesh.get(), v0);
+                        resultMesh.unite(cubeMesh.get());
                     }
-                    resultMesh.unite(scaledMesh);
                     }
                 }
             }
-        resultMesh.flipTriangleOrientation();
+        resultMesh.computeTriangleNormals();
         return resultMesh;
         }
 
