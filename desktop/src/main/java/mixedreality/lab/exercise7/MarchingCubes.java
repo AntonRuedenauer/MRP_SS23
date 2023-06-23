@@ -99,12 +99,14 @@ public class MarchingCubes {
         for (int x = 0; x < resX; x++) {
             for (int y = 0; y < resY; y++) {
                 for (int z = 0; z < resZ; z++) {
-                    // v = vorne   u = unten  l = links
-                    // h = hinten  o = oben   r = rechts
+
+                    // Schritt 4: Bestimme die Eckpunkte des aktuellen Würfels
                     float px = ll.x + (x*cellSizeX);
                     float py = ll.y + (y*cellSizeY);
                     float pz = ll.z + (z*cellSizeZ);
 
+                    // v = vorne   u = unten  l = links
+                    // h = hinten  o = oben   r = rechts
                     Vector3f vul = new Vector3f(px, py, pz);
                     Vector3f vur = new Vector3f(px+cellSizeX, py, pz);
                     Vector3f hur = new Vector3f(px+cellSizeX, py, pz+cellSizeZ);
@@ -113,7 +115,6 @@ public class MarchingCubes {
                     Vector3f vor = new Vector3f(px+cellSizeX, py+cellSizeY, pz);
                     Vector3f hor = new Vector3f(px+cellSizeX, py+cellSizeY, pz+cellSizeZ);
                     Vector3f hol = new Vector3f(px, py+cellSizeY, pz+cellSizeZ);
-                    // Schritt 4: Bestimme die Eckpunkte des aktuellen Würfels
                     // Schritt 5: Bestimme die Funktionswerte der Eckpunkte
                     float val0 = f.eval(vul);
                     float val1 = f.eval(vur);
